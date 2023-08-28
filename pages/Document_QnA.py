@@ -8,12 +8,17 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.document_loaders import PyPDFLoader
 from langchain.callbacks import get_openai_callback
+import yaml
+
+# Load the YAML file
+with open('secrets.yaml', 'r') as f:
+    config = yaml.safe_load(f)
 
 st.title('GPT-4 + Document Embedding (Pinecone)')
 
 # Get OpenAI API key, Pinecone API key and environment, and source document input
-openai_api_key = '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'
-pinecone_api_key = '6f0d09f7-2ed1-4d98-aa67-8cfad0d2cae4'
+openai_api_key = st.text_input("OpenAI API Key")
+pinecone_api_key = st.text_input("Pinecone API Key")
 pinecone_env = 'eu-west1-gcp'
 pinecone_index = 'newtesting'
 source_doc = st.file_uploader(
