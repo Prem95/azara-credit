@@ -41,9 +41,9 @@ else:
 
         # Enter text for LLM
         text = st.text_area("Enter text for LLM", height=100)
-        cal_button = st.button("Calculate")
+        cal_button = st.button("Token Costs")
 
-        if cal_button:
+        if cal_button and text:
 
             length, price = count_tokens_return_length_price(text, st.session_state["MODEL"])
             st.markdown(f'GPT model: **{st.session_state["MODEL"]}**')
@@ -51,13 +51,19 @@ else:
             st.markdown(f"Estimated Tokens: **{length}**")
             st.markdown(f"Estimated Price (USD): **${price:g}**")
 
+        number_of_words = len(text.split()) if text else 0
+
 
     # Inputs for Pinecone
     with col2:
         st.header("Pinecone")
         pinecode_pods = st.number_input("Number of Pods", min_value=1, max_value=5, value=1)
-        pinecone_retrievel_duration = st.number_input("Document Retrieval Duration (seconds)", min_value=0, max_value=86400, value=30, step=1)
-        pinecone_costs = st.number_input("Pinecone Costs ($/hour)", min_value=0.0, max_value=100.0, value=0.1, step=0.1)
+        pinecone_retrievel_duration = st.number_input("Document Retrieval Duration (seconds)", min_value=0, max_value=1000, value=30, step=1)
+        pinecone_cost_per_hour = 0.096
+        cloud_provider = st.selectbox("Cloud Provider", ("aws", "gcp", "azure"))
+        storage_type = 's1'
+        instance_type = st.selectbox("Instance Type", ("x1", "x2", "x4", "x8"))
+
 
     # Inputs for document upload
     with col3:
@@ -79,33 +85,28 @@ else:
                 raise ValueError("File type not supported!")
 
             length, price = count_tokens_return_length_price(doc, st.session_state["MODEL"])
-            st.markdown(f'GPT model: {st.session_state["MODEL"]}')
-            st.markdown(f"Estimated Words: {len(doc)}")
-            st.markdown(f"Estimated Tokens: {length}")
-            st.markdown(f"Estimated Price (USD): ${price:g}")
+            doc_button = st.button("Document Cost")
 
-    # col1, col2 = st.columns(2)
+            if doc_button:
+                st.markdown(f'GPT model: {st.session_state["MODEL"]}')
+                st.markdown(f"Estimated Words: {len(doc)}")
+                st.markdown(f"Estimated Tokens: {length}")
+                st.markdown(f"Estimated Price (USD): ${price:g}")
 
-    # with col1:
-    #     st.header("WhatsApp Business API")
+            number_of_words = len(text.split()) if text else len(doc)
 
-    # with col2:
-    #     st.header("Twilio API")
+    if st.button("Estimated Azara Credit for Document Embedding"):
 
-
-
-# Calculate button
-# if st.button("Calculate Estimated Azara Credit"):
-#     credit = calculate_azara_credit(number_of_words, pinecode_pods, pinecone_retrievel_duration, pinecone_costs, model)
-#     df = pd.DataFrame(
-#         {
-#             "Estimated Azara Credit ($)": [credit],
-#             "Estimated Azara Credit with Margin ($)": [credit * (1 + AZARA_MARGIN / 100)],
-#             "Estimated Azara Credit with AWS Cost ($)": [credit + AWS_COST],
-#             "Estimated Azara Credit with Margin and AWS Cost ($)": [credit * (1 + AZARA_MARGIN / 100) + AWS_COST],
-#         }
-#     )
-#     st.table(df)
+        credit = calculate_azara_credit(number_of_words, pinecode_pods, pinecone_retrievel_duration, st.session_state["MODEL"], cloud_provider, storage_type, instance_type)
+        df = pd.DataFrame(
+            {
+                "Azara Credit ($)": [credit],
+                "Azara Credit with Margin ($)": [credit * (1 + AZARA_MARGIN / 100)],
+                "Azara Credit with AWS Cost ($)": [credit + AWS_COST],
+                "Azara Credit with Margin and AWS Cost ($)": [credit * (1 + AZARA_MARGIN / 100) + AWS_COST],
+            }
+        )
+        st.table(df)
 
 
 

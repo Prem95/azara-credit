@@ -14,22 +14,6 @@ class IntegrationCosts:
             'service_conversation': {'conversation': 0.0022, 'message': 0.005},
         }
 
-    def get_whatsapp_cost_malaysia(self, api_type, calls):
-        """
-        Compute the cost for WhatsApp API calls in Malaysia.
-
-        :param api_type: Type of API call. Either 'marketing', 'utility', 'authentication', or 'service'.
-        :param calls: Number of API calls.
-        :return: Total cost.
-        """
-        if api_type not in self.whatsapp_costs_malaysia:
-            raise ValueError("Invalid API type. Choose either 'marketing', 'utility', 'authentication', or 'service'.")
-
-        cost_per_call = self.whatsapp_costs_malaysia[api_type]
-        total_cost = cost_per_call * calls
-
-        return total_cost
-
     def get_twilio_whatsapp_cost(self, conversation_type, conversations, messages):
         """
         Compute the cost for Twilio + WhatsApp conversations and messages.
@@ -47,6 +31,11 @@ class IntegrationCosts:
         total_cost = (cost_per_conversation * conversations) + (cost_per_message * messages)
 
         return total_cost
+
+    def get_pinecone_cost(self, pinecone_pods, pinecone_retrieval_duration, pinecone_cost_per_hour):
+        total_pinecone_cost = pinecone_pods * pinecone_retrieval_duration * pinecone_cost_per_hour
+
+        return total_pinecone_cost
 
 # # Example usage:
 # integration_costs = IntegrationCosts()
