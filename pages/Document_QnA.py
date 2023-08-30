@@ -43,8 +43,6 @@ query = col1.text_area("What is your question?", value="Summarise this document"
 twilio_whatsapp_api_per_message = 0.005
 twilio_integration = st.checkbox("Twilio WhatsApp Integration")
 
-
-
 col1, col2 = st.columns(2)
 number_of_interactions = col1.number_input("Number of Interactions", value=1, min_value=1, max_value=20)
 average_time_per_interaction = col2.number_input("Average Time per Interaction (minutes)", value=1, min_value=1, max_value=3, step=1)
@@ -54,7 +52,7 @@ if 'queries_per_hour' not in st.session_state:
 
 if st.button("Estimate Cost"):
     if not openai_api_key or not pinecone_api_key or not pinecone_env or not pinecone_index or not source_doc or not query:
-        st.warning(f"Please upload the document and provide the missing fields.")
+        st.warning(f"Please check document or keys are provided.")
     else:
         try:
             # Save uploaded file temporarily to disk, load and split the file into pages, delete temp file
@@ -98,7 +96,6 @@ if st.button("Estimate Cost"):
 
             st.header("Cost Breakdown")
             st.write(f"Total Cost for Document Embedding: ${total_cost:.2f}")
-            st.write(f"Total Cost for Document Embedding with AWS + Pinecone: ${total_cost_per_hour + total_services_costs:.2f}")
 
             # per minute
             st.write(f"Total Cost for Document Embedding with AWS + Pinecone per minute: ${(total_cost_per_hour + total_services_costs)/60:.2f}")
