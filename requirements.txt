@@ -2,7 +2,7 @@ docx2txt==0.8
 PyMuPDF==1.22.2
 pyyaml
 streamlit==1.25.0
-langchain==0.0.268
+langchain==0.0.308
 openai==0.27.8
 tiktoken==0.4.0
 unstructured==0.10.4
